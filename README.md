@@ -13,6 +13,9 @@ Requires a key for the Metro API to be set as an environment variable.
 git clone https://github.com/shreyasrama/metro-bus-delays.git
 cd metro-bus-delays
 
+# Set up env vars
+cp .env.example .env
+
 # Ensure uv is installed first. Sync to create virtual env and download dependencies
 uv sync
 
