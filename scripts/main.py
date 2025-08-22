@@ -1,10 +1,11 @@
 import ijson
-import json
 import logging
 import os
 import requests
 import time
 from db_insert_calls import insert_calls
+
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 # Set up a logger to have a record of downloads/processes
 logging.basicConfig(filename='app.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
