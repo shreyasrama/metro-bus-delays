@@ -1,2 +1,11 @@
-[start]
-cmd = "fastapi run main.py --port 3000"
+[build]
+baseImage = "ghcr.io/astral-sh/uv:python3.13-bookworm-slim"
+
+[build.env]
+PYTHONUNBUFFERED = "1"
+
+[build.install]
+cmds = ["uv sync"]
+
+[build.start]
+cmd = "cd api && fastapi run main.py --port 3000"
