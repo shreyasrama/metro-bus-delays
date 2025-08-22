@@ -1,0 +1,14 @@
+[project]
+name = "metro-bus-delays"
+version = "0.1.0"
+description = "Collection, storage, and visualisation of bus delay data for Christchurch Metro."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "dotenv>=0.9.9",
+    "google-api-python-client>=2.179.0",
+    "gtfs-realtime-bindings>=1.0.0",
+    "ijson>=3.4.0",
+    "pandas>=2.3.1",
+    "requests>=2.32.5",
+]
