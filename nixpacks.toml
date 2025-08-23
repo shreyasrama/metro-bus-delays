@@ -1,7 +1,5 @@
-buildImage = "ghcr.io/astral-sh/uv:python3.13-bookworm-slim"
-
 [phases.install]
-cmds = ["uv sync"]
+cmds = ["uv sync --no-dev --frozen"]
 
 [start]
 cmd = "cd api && fastapi run main.py --port 3000"
