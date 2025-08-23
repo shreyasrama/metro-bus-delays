@@ -1,5 +1,0 @@
-[phases.install]
-cmds = ["uv sync --no-dev --frozen"]
-
-[start]
-cmd = "cd api && fastapi run main.py --port 3000"
