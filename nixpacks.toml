@@ -1,7 +1,11 @@
 [phases.setup]
 nixPkgs = [
-  "libspatialite",
-  "proj",
-  "geos",
-  "sqlite"
+    "python313",
+    "gcc",
+    "curl",
+    "wget",
+    "libspatialite",
+    "proj",
+    "geos",
+    "sqlite",
 ]
