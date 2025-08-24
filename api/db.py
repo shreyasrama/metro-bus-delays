@@ -24,8 +24,6 @@ async def get_latest(db_path: str):
 
 async def get_delays(db_path: str, start_date: str, end_date: str, delay: int):
     conn = sqlite3.connect(db_path)
-    conn.enable_load_extension(True)
-    conn.execute("SELECT load_extension('mod_spatialite');")
     cur = conn.cursor()
 
     cur.execute("""
@@ -37,7 +35,8 @@ async def get_delays(db_path: str, start_date: str, end_date: str, delay: int):
             bc.stop_point_name, 
             bc.aimed_departure_time, 
             bc.actual_departure_time,
-            AsText(s.geom) as geom,
+            s.stop_lat,
+            s.stop_lon,
             (
                 julianday(substr(replace(bc.actual_departure_time, 'T', ' '), 1, 19)) - 
                 julianday(substr(replace(bc.aimed_departure_time, 'T', ' '), 1, 19))
