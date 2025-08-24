@@ -1,0 +1,7 @@
+[phases.setup]
+nixPkgs = [
+  "libspatialite",
+  "proj",
+  "geos",
+  "sqlite"
+]
