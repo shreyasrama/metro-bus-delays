@@ -3,7 +3,7 @@ from aiocache import cached
 from fastapi import FastAPI, HTTPException, Security, status
 from fastapi.security import APIKeyHeader
 
-from db import get_latest, get_delays
+from db import get_calls, get_latest, get_delays
 from info import get_diagnostic_info
 
 # Set up API Key to be passed in via a header
@@ -35,6 +35,12 @@ async def latest(api_key: str = Security(get_api_key)):
     db_path = os.getenv("DB_PATH") or ""
 
     return {'latest': await get_latest(db_path=db_path)}
+
+@app.get("/calls/", description="Returns all bus calls within a specified date range.")
+async def calls(start: str, end: str, api_key: str = Security(get_api_key)):
+    db_path = os.getenv("DB_PATH") or ""
+
+    return {'calls': await get_calls(db_path=db_path, start_date=start, end_date=end)}
 
 @app.get("/delays/", description="Returns all bus calls within a specified date range and delay amount.")
 async def delays(start: str, end: str, delay: int = 3, api_key: str = Security(get_api_key)):

@@ -22,6 +22,28 @@ async def get_latest(db_path: str):
     latest_calls = cur.fetchall()
     return latest_calls
 
+async def get_calls(db_path: str, start_date: str, end_date: str):
+    conn = sqlite3.connect(db_path)
+    cur = conn.cursor()
+
+    cur.execute("""
+    SELECT 
+        direction_ref,
+        published_line_name,
+        stop_point_ref,
+        stop_point_name,
+        aimed_departure_time,
+        actual_departure_time,
+                s.stop_lat,
+                s.stop_lon
+    FROM bus_calls bc
+    JOIN stops s on bc.stop_point_ref = s.stop_id
+    WHERE response_timestamp BETWEEN ? AND ?
+    """, (start_date, end_date))
+
+    calls = cur.fetchall()
+    return calls
+
 async def get_delays(db_path: str, start_date: str, end_date: str, delay: int):
     conn = sqlite3.connect(db_path)
     cur = conn.cursor()
