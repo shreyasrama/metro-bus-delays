@@ -41,7 +41,8 @@ async def get_calls(db_path: str, start_date: str, end_date: str):
     WHERE response_timestamp BETWEEN ? AND ?
     """, (start_date, end_date))
 
-    calls = cur.fetchall()
+    columns = [desc[0] for desc in cur.description]
+    calls = [dict(zip(columns, row)) for row in cur.fetchall()]
     return calls
 
 async def get_delays(db_path: str, start_date: str, end_date: str, delay: int):
