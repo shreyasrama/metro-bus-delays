@@ -6,21 +6,37 @@ async def get_latest(db_path: str):
 
     cur.execute("""
     SELECT 
-        direction_ref, 
-        published_line_name, 
-        stop_point_ref, 
-        stop_point_name, 
-        aimed_departure_time, 
-        actual_departure_time 
-        FROM bus_calls 
-        
-        WHERE response_timestamp = (
-            SELECT response_timestamp FROM bus_calls ORDER BY ID DESC LIMIT 1
-        );
+        response_timestamp,
+        direction_ref,
+        published_line_name,
+        stop_point_ref,
+        stop_point_name,
+        aimed_departure_time,
+        actual_departure_time,
+        s.stop_lat,
+        s.stop_lon,
+        (
+            julianday(substr(replace(bc.actual_departure_time, 'T', ' '), 1, 19)) - 
+            julianday(substr(replace(bc.aimed_departure_time, 'T', ' '), 1, 19))
+        ) * 24 * 60 AS delay_minutes
+    FROM bus_calls bc
+    JOIN stops s ON bc.stop_point_ref = s.stop_id
+    WHERE response_timestamp = (
+        SELECT response_timestamp FROM bus_calls ORDER BY ID DESC LIMIT 1
+    );
     """)
 
-    latest_calls = cur.fetchall()
-    return latest_calls
+    columns = [desc[0] for desc in cur.description]
+    latest_calls = [dict(zip(columns, row)) for row in cur.fetchall()]
+    response_timestamp = latest_calls[0]['response_timestamp'] if latest_calls else None
+
+    for call in latest_calls:
+        call.pop('response_timestamp', None)
+
+    return {
+        "response_timestamp": response_timestamp,
+        "latest_calls": latest_calls
+    }
 
 async def get_calls(db_path: str, start_date: str, end_date: str):
     conn = sqlite3.connect(db_path)
@@ -34,8 +50,8 @@ async def get_calls(db_path: str, start_date: str, end_date: str):
         stop_point_name,
         aimed_departure_time,
         actual_departure_time,
-                s.stop_lat,
-                s.stop_lon
+        s.stop_lat,
+        s.stop_lon
     FROM bus_calls bc
     JOIN stops s on bc.stop_point_ref = s.stop_id
     WHERE response_timestamp BETWEEN ? AND ?

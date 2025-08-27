@@ -34,7 +34,7 @@ async def info():
 async def latest(api_key: str = Security(get_api_key)):
     db_path = os.getenv("DB_PATH") or ""
 
-    return {'latest': await get_latest(db_path=db_path)}
+    return await get_latest(db_path=db_path)
 
 @app.get("/calls/", description="Returns all bus calls within a specified date range.")
 async def calls(start: str, end: str, api_key: str = Security(get_api_key)):
