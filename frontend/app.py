@@ -28,7 +28,7 @@ app.layout = html.Div([
     ),
     dcc.Interval(
         id='interval-component',
-        interval=10000,
+        interval=300000,
         n_intervals=0
     ),
     dcc.Store(id='latest-timestamp', data=str(initial_timestamp)),
