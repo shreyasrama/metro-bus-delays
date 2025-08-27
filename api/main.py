@@ -30,7 +30,6 @@ async def info():
     return await get_diagnostic_info(log_path=log_path, db_path=db_path)
 
 @app.get("/latest", description="Returns all entries that have the most recent response_timestamp.")
-@cached(ttl=60)
 async def latest(api_key: str = Security(get_api_key)):
     db_path = os.getenv("DB_PATH") or ""
 
