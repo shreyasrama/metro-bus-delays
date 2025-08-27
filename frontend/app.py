@@ -5,8 +5,10 @@ from datetime import datetime
 from fetch import fetch_latest_data
 from map import create_map, update_map
 import os
+from waitress import serve
 
 app = dash.Dash(__name__)
+server = app.server
 
 endpoint = os.getenv("API_ENDPOINT") or ""
 api_key = os.getenv("API_KEY") or ""
@@ -65,4 +67,7 @@ def update_h1(timestamp: str):
         return "Live Bus Delays"
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    if os.getenv("ENVIRONMENT") == "prod":
+        serve(server, host='0.0.0.0', port=3000)
+    else:
+        app.run(debug=True)
