@@ -21,20 +21,27 @@ initial_title = f"Live Bus Delays - {initial_timestamp.strftime('%A, %d %B %Y %H
 fig = create_map(initial_df)
 update_map(fig)
 
-app.layout = html.Div([
-    html.H1(str(initial_title), id="app-title"),
-    dcc.Graph(
-        id='live-update-graph',
-        figure=fig,
-        style={'height': '90vh', 'width': '90vw'}
-    ),
-    dcc.Interval(
-        id='interval-component',
-        interval=300000,
-        n_intervals=0
-    ),
-    dcc.Store(id='latest-timestamp', data=str(initial_timestamp)),
-])
+app.title = "Live Bus Delays in Christchurch"
+
+app.layout = html.Div(
+    id="main-div",
+    children = [
+        html.H1(str(initial_title), id="app-title"),
+        html.P("Data updates every 5 minutes. Delays are based on actual recorded time a bus leaves the stop."),
+        dcc.Graph(
+            id='live-update-graph',
+            figure=fig,
+            responsive=True,
+            style={'height': '85vh'}  # Full viewport height
+        ),
+        dcc.Interval(
+            id='interval-component',
+            interval=300000,
+            n_intervals=0
+        ),
+        dcc.Store(id='latest-timestamp', data=str(initial_timestamp)),
+    ]
+)
 
 @app.callback(
     Output('live-update-graph', 'figure'),

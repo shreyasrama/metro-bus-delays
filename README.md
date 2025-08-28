@@ -75,7 +75,7 @@ fastapi dev api/main.py
 fastapi run /app/api/main.py --port 3000
 ```
 
-## Running locally - frontend
+## Frontend setup
 
 `API_KEY` is required to be set as an environment variable. `ENVIRONMENT` is required to be set to `prod` when running the production server.
 

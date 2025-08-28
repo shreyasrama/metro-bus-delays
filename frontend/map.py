@@ -26,8 +26,13 @@ def create_map(df: pd.DataFrame) -> go.Figure:
             colorbar=dict(title="Delay (minutes)") if colorscale else None
         ),
         text=[
-            f"{name}<br>Delay: {round(delay)} minutes" for name, delay in 
-              zip(df['stop_point_name'], df.get('delay_minutes', [0]*len(df)))
+            f"{line}: {direction}<br>{name}<br>Delay: {round(delay)} minutes" for line, direction, name, delay in 
+                zip(
+                    df['published_line_name'],
+                    df['direction_ref'],
+                    df['stop_point_name'], 
+                    df.get('delay_minutes', [0]*len(df))
+                )
         ],
         hoverinfo='text',
     ))
@@ -44,5 +49,5 @@ def update_map(fig):
         ),
         margin=dict(l=0, r=0, t=0, b=0),
         autosize=True,
-        uirevision=True
+        uirevision=True,
     )
