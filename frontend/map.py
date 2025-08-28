@@ -5,6 +5,9 @@ import pandas as pd
 import plotly.graph_objects as go
 
 def create_map(df: pd.DataFrame) -> go.Figure:
+    if 'delay_minutes' in df.columns:
+        df = df[df['delay_minutes'] >= 2]
+
     if not df.empty and 'delay_minutes' in df.columns:
         marker_color = df['delay_minutes'].clip(0, 20)  # Assuming delay in minutes
         colorscale = 'orrd'
