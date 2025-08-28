@@ -14,4 +14,4 @@ def fetch_latest_data(endpoint: str, api_key: str) -> dict:
     except (requests.exceptions.RequestException, KeyError, ValueError) as e:
         print(f"Error fetching data: {e}")
 
-        return {"data": pd.DataFrame(), "timestamp": ''}  # Return empty dataframe and timestamp on error
+        return {"data": pd.DataFrame(), "timestamp": ''}

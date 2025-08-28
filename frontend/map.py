@@ -1,15 +1,11 @@
-from datetime import datetime
-from fetch import fetch_latest_data
-import os
 import pandas as pd
 import plotly.graph_objects as go
 
 def create_map(df: pd.DataFrame) -> go.Figure:
-    if 'delay_minutes' in df.columns:
-        df = df[df['delay_minutes'] >= 2]
-
+    # Delays of 2 minutes or greater only
     if not df.empty and 'delay_minutes' in df.columns:
-        marker_color = df['delay_minutes'].clip(0, 20)  # Assuming delay in minutes
+        df = df[df['delay_minutes'] >= 2]
+        marker_color = df['delay_minutes'].clip(0, 20)
         colorscale = 'orrd'
     else:
         marker_color = 'blue'
@@ -25,6 +21,8 @@ def create_map(df: pd.DataFrame) -> go.Figure:
             colorscale=colorscale,
             colorbar=dict(title="Delay (minutes)") if colorscale else None
         ),
+
+        # Construct text object for tooltip
         text=[
             f"{line}: {direction}<br>{name}<br>Delay: {round(delay)} minutes" for line, direction, name, delay in 
                 zip(
@@ -36,7 +34,7 @@ def create_map(df: pd.DataFrame) -> go.Figure:
         ],
         hoverinfo='text',
     ))
-
+    
     return fig
 
 def update_map(fig):

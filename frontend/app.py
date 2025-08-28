@@ -13,15 +13,17 @@ server = app.server
 endpoint = os.getenv("API_ENDPOINT") or ""
 api_key = os.getenv("API_KEY") or ""
 
+# Set up initial state for when page loads
 initial_data = fetch_latest_data(endpoint, api_key)
 initial_df = initial_data["data"]
 initial_timestamp = datetime.fromisoformat(initial_data["timestamp"])
-initial_title = f"Live Bus Delays - {initial_timestamp.strftime('%A, %d %B %Y %H:%M:%S')}"
+initial_title = f"Bus Delays - {initial_timestamp.strftime('%A, %d %B %Y %H:%M:%S')}"
 
+# Create and update initial map
 fig = create_map(initial_df)
 update_map(fig)
 
-app.title = "Live Bus Delays in Christchurch"
+app.title = "Bus Delays in Christchurch"
 
 app.layout = html.Div(
     id="main-div",
@@ -32,17 +34,21 @@ app.layout = html.Div(
             id='live-update-graph',
             figure=fig,
             responsive=True,
-            style={'height': '85vh'}  # Full viewport height
+            style={'height': '85vh'}
         ),
+        # Naively update every minute even though the underlying API only has new data every 5 mins.
+        # Interval should probably be dynamic based on timestamp but not really worth it - better to
+        # just use SSE if going through all that effort.
         dcc.Interval(
             id='interval-component',
-            interval=300000,
+            interval=60000,
             n_intervals=0
         ),
         dcc.Store(id='latest-timestamp', data=str(initial_timestamp)),
     ]
 )
 
+# Callback to return map with latest data and its associated timestamp
 @app.callback(
     Output('live-update-graph', 'figure'),
     Output('latest-timestamp', 'data'),
@@ -59,20 +65,22 @@ def update_graph_live(n, _):
 
     return fig, latest_timestamp
 
+# Callback to update the title with the latest timestamp
 @app.callback(
     Output('app-title', 'children'),
     Input('latest-timestamp', 'data')
 )
 def update_h1(timestamp: str):
     if not isinstance(timestamp, str):
-        return "Live Bus Delays"
+        return "Bus Delays"
     try:
         latest_timestamp = datetime.fromisoformat(timestamp)
-        latest_title = f"Live Bus Delays - {latest_timestamp.strftime('%A, %d %B %Y %H:%M:%S')}"
+        latest_title = f"Bus Delays - {latest_timestamp.strftime('%A, %d %B %Y %H:%M:%S')}"
         return latest_title
     except Exception:
-        return "Live Bus Delays"
+        return "Bus Delays"
 
+# Use waitress for prod, otherwise use Flask
 if __name__ == '__main__':
     if os.getenv("ENVIRONMENT") == "prod":
         serve(server, host='0.0.0.0', port=3000)
