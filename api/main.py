@@ -1,9 +1,8 @@
-import os
-from aiocache import cached
 from fastapi import FastAPI, HTTPException, Security, status
 from fastapi.security import APIKeyHeader
+import os
 
-from db import get_calls, get_latest, get_delays
+from db import get_calls, get_latest, get_delays, get_route_shapes
 from info import get_diagnostic_info
 
 # Set up API Key to be passed in via a header
@@ -46,5 +45,12 @@ async def delays(start: str, end: str, delay: int = 3, api_key: str = Security(g
     db_path = os.getenv("DB_PATH") or ""
 
     return {'delays': await get_delays(db_path=db_path, start_date=start, end_date=end, delay=delay)}
+
+@app.get("/route_shapes/", description="Returns all route shapes from the database.")
+async def route_shapes():
+    db_path = os.getenv("DB_PATH") or "metro_bus_delays.sqlite"
+    print(db_path)
+
+    return {'route_shapes': await get_route_shapes(db_path=db_path)}
 
 # endregion

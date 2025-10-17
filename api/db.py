@@ -1,3 +1,4 @@
+import json
 import sqlite3
 
 async def get_latest(db_path: str):
@@ -46,6 +47,7 @@ async def get_calls(db_path: str, start_date: str, end_date: str):
     SELECT 
         direction_ref,
         published_line_name,
+        trip_import_code,
         stop_point_ref,
         stop_point_name,
         aimed_departure_time,
@@ -90,3 +92,59 @@ async def get_delays(db_path: str, start_date: str, end_date: str, delay: int):
     columns = [desc[0] for desc in cur.description]
     calls = [dict(zip(columns, row)) for row in cur.fetchall()]
     return calls
+
+async def get_route_shapes(db_path: str):
+    conn = sqlite3.connect(db_path)
+    conn.enable_load_extension(True)
+    conn.execute("SELECT load_extension('/opt/homebrew/opt/libspatialite/lib/mod_spatialite');")
+    cur = conn.cursor()
+
+    # Query to select the largest shape_geom for each route_id
+    cur.execute("""
+    SELECT
+        route_id,
+        route_long_name,
+        shape_id,
+        AsGeoJSON(shape_geom) AS geometry
+    FROM route_shapes
+    WHERE ROWID IN (
+        SELECT ROWID
+        FROM (
+            SELECT 
+                route_id,
+                route_long_name,
+                shape_id,
+                shape_geom,
+                ROWID,
+                ST_Length(shape_geom) AS geom_length
+            FROM route_shapes
+        )
+        WHERE geom_length = (
+            SELECT MAX(ST_Length(shape_geom))
+            FROM route_shapes AS inner_shapes
+            WHERE inner_shapes.route_id = route_shapes.route_id
+        )
+    )
+    """)
+    
+    columns = [desc[0] for desc in cur.description]
+    shapes = [dict(zip(columns, row)) for row in cur.fetchall()]
+    
+    # Convert to GeoJSON FeatureCollection
+    geojson = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "geometry": json.loads(shape["geometry"]),
+                "properties": {
+                    "route_id": shape["route_id"],
+                    "route_long_name": shape["route_long_name"],
+                    "shape_id": shape["shape_id"]
+                }
+            }
+            for shape in shapes if shape["geometry"]  # Ensure geometry is not null
+        ]
+    }
+    
+    return geojson
