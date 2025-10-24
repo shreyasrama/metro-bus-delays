@@ -5,10 +5,10 @@ A monorepo that interacts with Christchurch Metro's SIRI API to visualise bus de
 - `scripts/` - a collection of Python scripts to set up a local SQLite database, interact with Metro's API, and persist data to the database.
     - Can be used with `cron` for automation.
 - `api/` - a lightweight implementation of FastAPI designed to connect to the SQLite database and return processed data
-    - Available at https://metro-bus-delays-api.rama.nz
+    - ~Available at https://metro-bus-delays-api.rama.nz~ _not running currently_
     - Endpoints are protected by API keys
 - `frontend/` - Dash/Plotly web visualisations of bus delays using the returned processed data
-    - Available at https://metro-bus-delays.rama.nz
+    - ~Available at https://metro-bus-delays.rama.nz~ _not running currently_
 
 The API and frontend are deployed to a VPS running Coolify.
 
